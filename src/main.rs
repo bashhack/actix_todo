@@ -5,6 +5,7 @@ mod handlers;
 mod models;
 
 use crate::handlers::*;
+use crate::models::AppState;
 use actix_web::{web, App, HttpServer};
 use dotenv::dotenv;
 use slog::{info, o, Drain, Logger};
@@ -36,7 +37,10 @@ async fn main() -> io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .data(pool.clone())
+            .data(AppState {
+                pool: pool.clone(),
+                log: log.clone(),
+            })
             .route("/", web::get().to(status))
             .route("/todos{_:/?}", web::get().to(get_todos))
             .route("/todos{_:/?}", web::post().to(create_todo))

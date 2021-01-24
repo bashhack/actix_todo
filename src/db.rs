@@ -12,7 +12,7 @@ pub async fn get_todos(client: &Client) -> Result<Vec<TodoList>, AppError> {
     let todos = client
         .query(&statement, &[])
         .await
-        .expect("Error getting todo lists")
+        .map_err(AppError::db_error)?
         .iter()
         .map(|row| TodoList::from_row_ref(row).unwrap())
         .collect::<Vec<TodoList>>();
@@ -29,7 +29,7 @@ pub async fn get_items(client: &Client, list_id: i32) -> Result<Vec<TodoItem>, A
     let items = client
         .query(&statement, &[&list_id])
         .await
-        .expect("Error getting todo items")
+        .map_err(AppError::db_error)?
         .iter()
         .map(|row| TodoItem::from_row_ref(row).unwrap())
         .collect::<Vec<TodoItem>>();
@@ -46,7 +46,7 @@ pub async fn create_todo(client: &Client, title: String) -> Result<TodoList, App
     client
         .query(&statement, &[&title])
         .await
-        .expect("Error creating todo list")
+        .map_err(AppError::db_error)?
         .iter()
         .map(|row| TodoList::from_row_ref(row).unwrap())
         .collect::<Vec<TodoList>>()
@@ -59,7 +59,7 @@ pub async fn create_todo(client: &Client, title: String) -> Result<TodoList, App
 }
 
 pub async fn check_item(client: &Client, list_id: i32, item_id: i32) -> Result<bool, AppError> {
-    let statement = client.prepare("update todo_item set checked = true where list_id = $1 and id = $2 and checked = false").await.unwrap();
+    let statement = client.prepare("update todo_item set checked = true where list_id = $1 and id = $2 and checked = false").await.map_err(AppError::db_error)?;
     let result = client
         .execute(&statement, &[&list_id, &item_id])
         .await
