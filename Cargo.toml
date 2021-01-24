@@ -1,0 +1,21 @@
+[package]
+name = "todo_actix_web"
+version = "0.1.0"
+authors = ["bashhack"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-rt = "2.0.0-beta.2"
+actix-web = "4.0.0-beta.1"
+serde = "1.0.119"
+config = "0.10.1"
+dotenv = "0.15.0"
+tokio-pg-mapper = "0.2.0"
+tokio-pg-mapper-derive = "0.2.0"
+deadpool-postgres = "0.7.0"
+tokio-postgres = "0.7.0"
+slog = "2.7.0"
+slog-term = "2.6.0"
+slog-async = "2.6.0"
