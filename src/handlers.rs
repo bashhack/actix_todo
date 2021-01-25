@@ -1,9 +1,9 @@
 use crate::db;
-use crate::errors::{AppError, AppErrorResponse};
+use crate::errors::AppError;
 use crate::models::{AppState, CreateTodoList, ResultResponse, Status};
 use actix_web::{web, HttpResponse, Responder};
 use deadpool_postgres::{Client, Pool};
-use slog::{o, crit, Logger, error};
+use slog::{crit, error, o, Logger};
 
 pub async fn get_client(pool: Pool, log: Logger) -> Result<Client, AppError> {
     pool.get().await.map_err(|err| {
@@ -31,7 +31,9 @@ pub async fn get_todos(state: web::Data<AppState>) -> Result<impl Responder, App
     let log = state.log.new(o!("handler" => "get_todos"));
     let client: Client = get_client(state.pool.clone(), log.clone()).await?;
     let result = db::get_todos(&client).await;
-    result.map(|todos| HttpResponse::Ok().json(todos)).map_err(log_error(log))
+    result
+        .map(|todos| HttpResponse::Ok().json(todos))
+        .map_err(log_error(log))
 }
 
 pub async fn get_items(
@@ -41,7 +43,9 @@ pub async fn get_items(
     let log = state.log.new(o!("handler" => "get_items"));
     let client: Client = get_client(state.pool.clone(), log.clone()).await?;
     let result = db::get_items(&client, list_id.0).await;
-    result.map(|items| HttpResponse::Ok().json(items)).map_err(log_error(log))
+    result
+        .map(|items| HttpResponse::Ok().json(items))
+        .map_err(log_error(log))
 }
 
 pub async fn create_todo(
@@ -51,7 +55,9 @@ pub async fn create_todo(
     let log = state.log.new(o!("handler" => "create_todo"));
     let client: Client = get_client(state.pool.clone(), log.clone()).await?;
     let result = db::create_todo(&client, json.title.clone()).await;
-    result.map(|todo| HttpResponse::Ok().json(todo)).map_err(log_error(log))
+    result
+        .map(|todo| HttpResponse::Ok().json(todo))
+        .map_err(log_error(log))
 }
 
 pub async fn check_item(
@@ -61,5 +67,7 @@ pub async fn check_item(
     let log = state.log.new(o!("handler" => "check_item"));
     let client: Client = get_client(state.pool.clone(), log.clone()).await?;
     let result = db::check_item(&client, list_id, item_id).await;
-    result.map(|updated| HttpResponse::Ok().json(ResultResponse { success: updated })).map_err(log_error(log))
+    result
+        .map(|updated| HttpResponse::Ok().json(ResultResponse { success: updated }))
+        .map_err(log_error(log))
 }

@@ -7,7 +7,7 @@ use std::fmt;
 #[derive(Debug)]
 pub enum AppErrorType {
     DbError,
-    NotFoundError,
+    NotFoundError, // Need to populate for GETs
 }
 
 #[derive(Debug)]
@@ -66,5 +66,41 @@ impl ResponseError for AppError {
         HttpResponse::build(self.status_code()).json(AppErrorResponse {
             error: self.message(),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::{AppError, AppErrorType};
+
+    #[test]
+    fn test_default_message() {
+        let db_error: AppError = AppError {
+            message: None,
+            cause: None,
+            error_type: AppErrorType::DbError,
+        };
+
+        assert_eq!(
+            db_error.message(),
+            "An unexpected error has occurred".to_string(),
+            "Default message should be shown"
+        )
+    }
+
+    #[test]
+    fn test_custom_message() {
+        let db_error: AppError = AppError {
+            message: Some("Item not found".to_string()),
+            cause: None,
+            error_type: AppErrorType::DbError,
+        };
+
+        assert_eq!(
+            db_error.message(),
+            "Item not found".to_string(),
+            "Custom user-facing error message should be shown"
+        )
     }
 }
