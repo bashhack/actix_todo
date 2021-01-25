@@ -16,6 +16,9 @@ jobs:
 
     container:
       image: bashhack/todo-actix-web-cache:latest
+      credentials:
+        username: ${{ secrets.docker_hub_username }}
+        password: ${{ secrets.docker_hub_password }}
 
     services:
       postgres:
